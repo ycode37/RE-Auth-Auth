@@ -76,3 +76,44 @@ export const registerUser = tryCatch(async (req, res) => {
       "User registered successfully. Please check your email to verify your account.",
   });
 });
+
+export const verifyUser = tryCatch(async (req, res) => {
+  const { token } = req.params;
+  if (!token) {
+    return res.status(400).json({
+      message: "Verification token is required",
+    });
+  }
+  const verifyKey = `verify:${token}`;
+  const userData = await redisClient.get(verifyKey);
+
+  if (!userData) {
+    return res.status(400).json({
+      message: "Invalid or expired verification token",
+    });
+  }
+  await redisClient.del(verifyKey);
+
+  const userDataJson = JSON.parse(userData);
+
+  const exisitingUser = await User.findOne({ email: userDataJson.email });
+
+  if (exisitingUser) {
+    return res.status(400).json({
+      message: "User already exists",
+    });
+  }
+  const newUser = await User.create({
+    name: userDataJson.name,
+    email: userDataJson.email,
+    password: userDataJson.password,
+  });
+  res.status(201).json({
+    message: "User verified and created successfully",
+    user: {
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+    },
+  });
+});
