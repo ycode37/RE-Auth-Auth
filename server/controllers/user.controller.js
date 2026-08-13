@@ -8,7 +8,12 @@ import { redisClient } from "../index.js";
 import crypto from "crypto";
 import sendMail from "../config/sendMail.js";
 import { getOtpHtml, getVerifyEmailHtml } from "../config/html.js";
-import { generateToken } from "../config/generateToken.js";
+import {
+  generateAccesstoken,
+  generateToken,
+  revokeRefreshToken,
+  verifyRefreshToken,
+} from "../config/generateToken.js";
 
 export const registerUser = tryCatch(async (req, res) => {
   const sanitizedBody = sanitize(req.body);
@@ -228,3 +233,30 @@ export const verifyOtp = tryCatch(async (req, res) => {
     refreshToken: tokenData.refreshToken,
   });
 });
+
+export const myProfile = tryCatch(async (req, res) => {
+  const user = req.user;
+  res.json(user);
+});
+
+export const refreshToken = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Refresh token not found" });
+  }
+  const decoded = await verifyRefreshToken(refreshToken);
+  if (!decoded) {
+    return res.status(401).json({ message: "Invalid refresh token" });
+  }
+  await generateAccesstoken(decoded.id, res);
+
+  res.status(200).json({ message: "Access token refreshed successfully" });
+};
+
+export const logoutUser = async (req, res) => {
+  const userId = req.user._id;
+  await revokeRefreshToken(userId);
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  res.status(200).json({ message: "Logged out successfully" });
+};
