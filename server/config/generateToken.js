@@ -18,14 +18,14 @@ export const generateToken = async (userId, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    // secure: true, // Ensure the cookie is sent over HTTPS
+    secure: true, // Ensure the cookie is sent over HTTPS
     sameSite: "strict", // Prevent CSRF attacks
     maxAge: 60 * 1000, // 1 minute
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    // secure: true, // Ensure the cookie is sent over HTTPS
-    // sameSite: "strict", // Prevent CSRF attacks
+    secure: true, // Ensure the cookie is sent over HTTPS
+    sameSite: "strict", // Prevent CSRF attacks
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     sameSite: "none",
   });
@@ -59,7 +59,6 @@ export const generateAccesstoken = async (id, res) => {
   });
 };
 
-export const revokeRefreshToken = async (userId)=>{
+export const revokeRefreshToken = async (userId) => {
   await redisClient.del(`refresh-token:${userId}`);
-  
-}
+};
