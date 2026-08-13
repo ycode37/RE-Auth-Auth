@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/user.route.js";
 import { createClient } from "redis";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 await connectDB(); // Connect to MongoDB
@@ -22,6 +23,7 @@ redisClient
 
 const app = express();
 app.use(express.json()); // Middleware to parse JSON request bodies
+app.use(cookieParser()); // Middleware to parse cookies
 app.use("/api/v1", userRoutes); // Use the user routes for API version 1
 
 const PORT = process.env.PORT || 5001;
