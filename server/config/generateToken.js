@@ -3,7 +3,7 @@ import { redisClient } from "../index.js";
 
 export const generateToken = async (userId, res) => {
   const accessToken = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: "1m",
+    expiresIn: "2m",
   });
 
   const refreshToken = jwt.sign({ id: userId }, process.env.REFRESH_SECRET, {
@@ -18,16 +18,16 @@ export const generateToken = async (userId, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: true, // Ensure the cookie is sent over HTTPS
-    sameSite: "strict", // Prevent CSRF attacks
-    maxAge: 60 * 1000, // 1 minute
+    // secure: true, // Ensure the cookie is sent over HTTPS
+    // sameSite: "strict", // Prevent CSRF attacks
+    maxAge: 60 * 1000 * 2, // 15 minutes
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: true, // Ensure the cookie is sent over HTTPS
-    sameSite: "strict", // Prevent CSRF attacks
+    // secure: true, // Ensure the cookie is sent over HTTPS
+    // sameSite: "strict", // Prevent CSRF attacks
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: "none",
+    // sameSite: "none",
   });
 
   return { accessToken, refreshToken };
@@ -48,14 +48,14 @@ export const verifyRefreshToken = async (refreshToken) => {
 
 export const generateAccesstoken = async (id, res) => {
   const accessToken = jwt.sign({ id: id }, process.env.JWT_SECRET, {
-    expiresIn: "1m",
+    expiresIn: "2m",
   });
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     // secure: true, // Ensure the cookie is sent over HTTPS
-    sameSite: "strict", // Prevent CSRF attacks
-    maxAge: 60 * 1000, // 1 minute
+    // sameSite: "strict", // Prevent CSRF attacks
+    maxAge: 60 * 1000 * 2, // 15 minutes
   });
 };
 
