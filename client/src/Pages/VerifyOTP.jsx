@@ -4,11 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { server } from "../main";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { AppData } from "../Context/AppContext";
 
 const VerifyOTP = () => {
   const [OTP, setOTP] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { fetchUser } = AppData();
   const submitHandler = async (e) => {
     e.preventDefault();
     const email = localStorage.getItem("email");
@@ -24,7 +26,8 @@ const VerifyOTP = () => {
           withCredentials: true, // Include cookies in the request
         },
       );
-      localStorage.clear("email");
+      localStorage.removeItem("email");
+      await fetchUser();
       toast.success(data.message);
       navigate("/dashboard");
     } catch (error) {
